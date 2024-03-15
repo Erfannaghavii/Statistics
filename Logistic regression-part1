@@ -1,0 +1,63 @@
+# Importing our data
+library(readr)
+mydata <- read_delim("C:/Users/mehdi/Desktop/Projects/15 - Statistics/Logistic regression/logistic regression dataset-Social_Network_Ads.txt", 
+                     delim = "\t", escape_double = FALSE, 
+                     trim_ws = TRUE)
+
+# 1. Data preprocessing
+# Checking whether our categorical variables are factors:
+class(mydata$Gender)
+class(mydata$Purchased)
+
+mydata$Gender <- as.factor(mydata$Gender)
+mydata$Purchased <- as.factor(mydata$Purchased)
+
+class(mydata$Gender)
+class(mydata$Purchased)
+
+# Determining reference level:
+mydata$Gender <- relevel(mydata$Gender , ref = "Male")
+mydata$Purchased <- relevel(mydata$Purchased , ref = "0")
+
+
+# 2. Logistic regression:
+library(carData)
+library(car)
+model <- glm(Purchased ~ 1 + Gender + Age + EstimatedSalary, data = mydata , family = binomial())
+model
+summary(model)
+
+# Checking the fitness of our model:
+modelchi <- model$null.deviance - model$deviance
+modelchi
+
+modeldf <- model$df.null - model$df.residual
+modeldf
+
+modelprob <- 1 - pchisq(modelchi , modeldf)
+modelprob
+
+# Checking the R2 of our model:
+logisticPseudoR2s <- function(LogModel) {
+  dev <- LogModel$deviance
+  nullDev <- LogModel$null.deviance
+  modelN <- length(LogModel$fitted.values)
+  R.l <- 1 - dev / nullDev
+  R.cs <- 1- exp ( -(nullDev - dev) / modelN)
+  R.n <- R.cs / ( 1 - ( exp (-(nullDev / modelN))))
+  cat("Pseudo R^2 for logistic regression\n")
+  cat("Hosmer and Lemeshow R^2 ", round(R.l, 3), "\n")
+  cat("Cox and Snell R^2 ", round(R.cs, 3), "\n")
+  cat("Nagelkerke R^2 ", round(R.n, 3), "\n")
+}
+
+logisticPseudoR2s(model)
+
+# Checking the odds ratios of our model variables:
+exp(model$coefficients)
+exp(confint(model))
+
+# Using our model to predict:
+customer <- data.frame(Gender = "Female" , Age = 10 , EstimatedSalary = 120000)
+customerprob <- predict(model , customer , type = "response")
+customerprob
