@@ -61,3 +61,33 @@ exp(confint(model))
 customer <- data.frame(Gender = "Female" , Age = 10 , EstimatedSalary = 120000)
 customerprob <- predict(model , customer , type = "response")
 customerprob
+
+
+# Creating a plot for our logistic regression model:
+class(mydata$Purchased)
+
+mydata$Purchased <- as.numeric(mydata$Purchased) - 1
+
+class(mydata$Purchased)
+
+library(ggplot2)
+
+# Plotting:
+plot <- ggplot(data = mydata, mapping = aes(x = Age, y = Purchased, color = "")) +
+  geom_jitter(height = 0.05, alpha = 0.8, size = 1.5, shape = 16) + 
+  geom_smooth(method = "glm", method.args = list(family = "binomial"), se = TRUE, color = 'blue') +
+  theme_classic() +
+  labs(title = "Logistic regression plot",
+       x = "Age",
+       y = "Purchase status",
+       color = "Legend") +
+  theme(plot.title = element_text(size = 12, face = 'bold'),
+        axis.title.x = element_text(size = 10),
+        axis.title.y = element_text(size = 10),
+        axis.text.x = element_text(size = 10),
+        legend.title = element_text(size = 10, face = 'bold'),
+        legend.position = 'right') + 
+  scale_color_manual(values = c('black') , labels = c('Participants')) +
+  scale_y_continuous(labels = c('Not purchased' , 'Purchased'), breaks = c(0 , 1))
+
+plot
