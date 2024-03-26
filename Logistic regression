@@ -91,3 +91,27 @@ plot <- ggplot(data = mydata, mapping = aes(x = Age, y = Purchased, color = ""))
   scale_y_continuous(labels = c('Not purchased' , 'Purchased'), breaks = c(0 , 1))
 
 plot
+
+
+# Casewise diagnostics: Outlier
+# Standardized residuals:
+mydata$standresid <- rstandard(model)
+
+# Studentized residuals:
+mydata$studresid <- rstudent(model)
+
+subset(mydata, standresid > 1.96)
+subset(mydata, standresid < -1.96)
+
+# Casewise diagnostics: Influential cases
+
+mydata$DFFit <- dffits(model)
+mydata$DFFit > 1
+
+DFBeta <- dfbeta(model)
+DFBeta > 1
+
+mydata$leverage <- hatvalues(model)
+# Expected value: (k  + 1)/N  k = Number of predictors  N = number of observations
+# Expected value: (3 + 1)/400 = 4/400 = 0.01
+hist(mydata$leverage)
