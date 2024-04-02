@@ -115,3 +115,13 @@ mydata$leverage <- hatvalues(model)
 # Expected value: (k  + 1)/N  k = Number of predictors  N = number of observations
 # Expected value: (3 + 1)/400 = 4/400 = 0.01
 hist(mydata$leverage)
+
+
+# Checking the linearity assumption of the logit
+
+mydata$logAgeInt <- log(mydata$Age) * mydata$Age
+mydata$logESInt <-log(mydata$EstimatedSalary) * mydata$EstimatedSalary
+
+model2 <- glm(Purchased ~ Age + Gender + EstimatedSalary + logAgeInt + logESInt,
+              data = mydata, family = binomial())
+summary(model2)
